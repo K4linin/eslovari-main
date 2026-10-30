@@ -3,7 +3,8 @@ FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    WEB_CONCURRENCY=3
 
 WORKDIR /app
 
@@ -25,4 +26,5 @@ USER app
 
 EXPOSE 8000
 ENTRYPOINT ["deploy/entrypoint.sh"]
-CMD ["gunicorn", "electronic_dictionary.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "60", "--access-logfile", "-"]
+# Число процессов gunicorn берёт из WEB_CONCURRENCY (на сервере с 512 МБ — 2)
+CMD ["gunicorn", "electronic_dictionary.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "60", "--access-logfile", "-"]

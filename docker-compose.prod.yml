@@ -30,6 +30,7 @@ services:
       DB_HOST: db
       BEHIND_PROXY: "True"
       MEDIA_ROOT: /app/media
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
     volumes:
       - media:/app/media
     # Наружу порт сайта тоже не открыт — запросы приходят только через Caddy
