@@ -1,0 +1,6 @@
+{# qs — параметр источника, например "set=web-basics" #}
+<div class="row-actions">
+  {% for key, m in modes.items %}
+  <a class="btn {% if forloop.first %}btn-white{% else %}btn-ghost-light{% endif %}" href="{% url 'trainer' %}?mode={{ key }}&{{ qs }}">{{ m.title }} {% include "dictionary/_arrow.html" %}</a>
+  {% endfor %}
+</div>

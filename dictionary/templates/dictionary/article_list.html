@@ -1,0 +1,23 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Статьи об IT на английском{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="bar">Статьи об IT на английском</h1>
+  <nav class="mode-switch" aria-label="Уровень">
+    <a class="chip" href="{% url 'article_list' %}" {% if not level %}aria-current="page"{% endif %}>Все уровни</a>
+    {% for l in levels %}<a class="chip" href="?level={{ l }}" {% if l == level %}aria-current="page"{% endif %}>{{ l }}</a>{% endfor %}
+  </nav>
+  {% if page.object_list %}
+  <div class="grid grid-3">{% for a in page.object_list %}{% include "dictionary/_article_card.html" %}{% endfor %}</div>
+  {% else %}
+  <div class="card"><p class="empty-muted center">Статей этого уровня пока нет.</p></div>
+  {% endif %}
+  {% if page.has_other_pages %}
+  <nav class="pager">
+    {% if page.has_previous %}<a class="chip" href="?page={{ page.previous_page_number }}{% if level %}&level={{ level }}{% endif %}">← Назад</a>{% endif %}
+    <span class="chip">{{ page.number }} / {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a class="chip" href="?page={{ page.next_page_number }}{% if level %}&level={{ level }}{% endif %}">Дальше →</a>{% endif %}
+  </nav>
+  {% endif %}
+</section>
+{% endblock %}

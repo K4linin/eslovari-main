@@ -1,0 +1,30 @@
+{% extends "dictionary/base.html" %}
+{% load static %}
+{% block title %}{{ mode_info.title }} — тренажёр{% endblock %}
+{% block content %}
+<div class="trainer section">
+  <nav class="mode-switch" aria-label="Режим">
+    {% for key, m in modes.items %}
+    <a class="chip" href="?mode={{ key }}{% if source_qs %}&{{ source_qs }}{% endif %}" {% if key == mode %}aria-current="page"{% endif %}>{{ m.title }}</a>
+    {% endfor %}
+  </nav>
+  <section class="card-blue trainer-stage" data-trainer data-result-url="{% url 'trainer_result' %}" data-logged-in="{{ user.is_authenticated|yesno:'1,0' }}">
+    <div class="section-head">
+      <span class="chip chip-dark">{{ title }}</span>
+      <span class="chip chip-dark" data-counter>0 / {{ count }}</span>
+    </div>
+    <div class="progress" aria-hidden="true"><span data-progress></span></div>
+    <div data-stage class="trainer-stage">
+      {% if not count %}
+      <p class="empty">Здесь пока нет слов для тренировки. Выберите другую тему или <a href="{% url 'home' %}#dictionary">добавьте слова из словаря</a>.</p>
+      {% else %}
+      <noscript><p class="empty">Для тренажёра нужен включённый JavaScript.</p></noscript>
+      {% endif %}
+    </div>
+    {% csrf_token %}
+  </section>
+  <p class="center muted small mt">Подсказка: в квизе работают клавиши 1–4, в карточках — пробел и стрелки.</p>
+</div>
+{{ trainer_data|json_script:"trainer-data" }}
+{% endblock %}
+{% block scripts %}<script src="{% static 'dictionary/js/trainer.js' %}" defer></script>{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "dictionary/base.html" %}
+{% block title %}{{ code }}{% endblock %}
+{% block content %}
+<section class="card-blue section error-page">
+  {% include "dictionary/_waves.html" with variant="hero" %}
+  <div>
+    <div class="error-code">{{ code }}</div>
+    <p class="lead">{{ text }}</p>
+    <a class="btn btn-white" href="{% url 'home' %}">На главную {% include "dictionary/_arrow.html" %}</a>
+  </div>
+</section>
+{% endblock %}

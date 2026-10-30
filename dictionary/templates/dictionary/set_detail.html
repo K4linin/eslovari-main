@@ -1,0 +1,19 @@
+{% extends "dictionary/base.html" %}
+{% block title %}{{ set.title }}{% endblock %}
+{% block content %}
+<section class="card-blue section">
+  {% include "dictionary/_waves.html" with variant="hero" %}
+  <div class="section-head">
+    <a class="chip chip-dark" href="{% url 'set_list' %}">← Все наборы</a>
+    {% if set.pk in fav_sets %}{% include "dictionary/_fav_button.html" with kind="set" obj=set active=True cls="fav-inline" %}{% else %}{% include "dictionary/_fav_button.html" with kind="set" obj=set active=False cls="fav-inline" %}{% endif %}
+  </div>
+  <h1 class="display page-title">{{ set.title }}</h1>
+  {% if set.description %}<p class="lead">{{ set.description }}</p>{% endif %}
+  {% with qs="set="|add:set.slug %}{% include "dictionary/_train_buttons.html" %}{% endwith %}
+</section>
+<section class="section">
+  <div class="words">
+    {% for entry in entries %}{% if entry.pk in fav_entries %}{% include "dictionary/_word_card.html" with fav=True %}{% else %}{% include "dictionary/_word_card.html" with fav=False %}{% endif %}{% empty %}<p class="muted">В наборе пока нет слов.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

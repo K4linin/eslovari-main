@@ -1,0 +1,59 @@
+# Боевой запуск на сервере (Selectel):
+#   docker compose -f docker-compose.prod.yml up -d --build
+# Настройки берутся из файла .env (см. .env.example и ХОСТИНГ.md).
+services:
+  db:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME:-eslovari}
+      POSTGRES_USER: ${DB_USER:-eslovari}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Задайте DB_PASSWORD в .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-eslovari} -d ${DB_NAME:-eslovari}"]
+      interval: 5s
+      retries: 10
+    # Порт базы наружу НЕ открыт — к ней ходит только сайт внутри Docker-сети
+
+  web:
+    build: .
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DEBUG: "False"
+      DB_ENGINE: postgresql
+      DB_HOST: db
+      BEHIND_PROXY: "True"
+      MEDIA_ROOT: /app/media
+      WEB_CONCURRENCY: ${WEB_CONCURRENCY:-2}
+    volumes:
+      - media:/app/media
+    # Наружу порт сайта тоже не открыт — запросы приходят только через Caddy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: always
+    depends_on:
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?Задайте DOMAIN в .env}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - media:/srv/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  media:
+  caddy_data:
+  caddy_config:

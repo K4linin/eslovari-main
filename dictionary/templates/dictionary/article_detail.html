@@ -1,0 +1,27 @@
+{% extends "dictionary/base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block description %}{{ article.summary|default:article.body|truncatechars:150 }}{% endblock %}
+{% block content %}
+<article class="article section">
+  <header class="card-blue">
+    {% include "dictionary/_waves.html" with variant="hero" %}
+    <div class="row-actions">
+      <a class="chip chip-dark" href="{% url 'article_list' %}">← Статьи</a>
+      <span class="chip chip-dark">{{ article.level }}</span>
+      <span class="chip chip-dark">{{ article.reading_minutes }} мин</span>
+    </div>
+    <h1 class="display page-title mt">{{ article.title }}</h1>
+    {% if article.summary %}<p class="lead">{{ article.summary }}</p>{% endif %}
+  </header>
+  <div class="card article-body section">{{ article.body|linebreaks }}</div>
+  {% with tags=article.tags.all %}{% if tags %}
+  <div class="row-actions section">{% for t in tags %}<a class="chip" href="{% url 'trainer' %}?mode=cards&tag={{ t.slug }}">Тренировать слова: {{ t.name }}</a>{% endfor %}</div>
+  {% endif %}{% endwith %}
+</article>
+{% if more %}
+<section class="section">
+  <h2 class="bar">Ещё почитать</h2>
+  <div class="grid grid-3 section">{% for a in more %}{% include "dictionary/_article_card.html" %}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

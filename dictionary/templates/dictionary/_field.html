@@ -1,0 +1,12 @@
+{% if field.is_hidden %}{{ field }}{% else %}
+<div class="field">
+  {% if field.field.widget.input_type == "checkbox" %}
+    <label class="check">{{ field }} <span>{{ field.label }}</span></label>
+  {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}
+  {{ field.errors }}
+</div>
+{% endif %}

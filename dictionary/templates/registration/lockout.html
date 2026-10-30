@@ -1,0 +1,12 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Вход временно заблокирован{% endblock %}
+{% block content %}
+<section class="card-blue section error-page">
+  {% include "dictionary/_waves.html" with variant="hero" %}
+  <div>
+    <div class="error-code">429</div>
+    <p class="lead">Слишком много неудачных попыток входа. В целях безопасности вход для этого аккаунта с вашего адреса заблокирован на час.</p>
+    <a class="btn btn-white" href="{% url 'password_reset' %}">Восстановить пароль</a>
+  </div>
+</section>
+{% endblock %}

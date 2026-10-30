@@ -1,0 +1,10 @@
+<article class="word">
+  {% include "dictionary/_fav_button.html" with kind="entry" obj=entry active=fav %}
+  <h3><a href="{{ entry.get_absolute_url }}">{{ entry.word }}</a></h3>
+  {% if entry.transcription %}<div class="tr">{{ entry.transcription }}</div>{% endif %}
+  <div class="ru">{{ entry.translation }}</div>
+  {% if entry.description %}<div class="desc">{{ entry.description|truncatechars:110 }}</div>{% endif %}
+  {% with tags=entry.tags.all %}{% if tags %}
+  <div class="tags">{% for t in tags %}<a class="tag-mini" href="{% url 'home' %}?tag={{ t.slug }}#dictionary">{{ t.name }}</a>{% endfor %}</div>
+  {% endif %}{% endwith %}
+</article>

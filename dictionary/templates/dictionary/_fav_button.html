@@ -1,0 +1,11 @@
+{# kind: entry | set | tag;  obj;  active (bool);  cls — доп. класс формы #}
+{% if user.is_authenticated %}
+<form method="post" action="{% url 'toggle_favorite' kind obj.pk %}" class="fav-form {{ cls }}" data-fav>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+  <button type="submit" class="fav-btn" aria-pressed="{% if active %}true{% else %}false{% endif %}" title="В избранное">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    <span class="visually-hidden">Избранное</span>
+  </button>
+</form>
+{% endif %}

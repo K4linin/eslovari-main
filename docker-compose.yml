@@ -1,0 +1,41 @@
+# Локальный запуск через Docker: docker compose up -d --build
+# Сайт: http://127.0.0.1:8000/
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eslovari
+      POSTGRES_USER: eslovari
+      POSTGRES_PASSWORD: local-dev-password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eslovari -d eslovari"]
+      interval: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: local-dev-only-key-0123456789abcdefghijklmnopqrstuvwxyz
+      ALLOWED_HOSTS: 127.0.0.1,localhost
+      DB_ENGINE: postgresql
+      DB_NAME: eslovari
+      DB_USER: eslovari
+      DB_PASSWORD: local-dev-password
+      DB_HOST: db
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - media:/app/media
+
+volumes:
+  pgdata:
+  media:

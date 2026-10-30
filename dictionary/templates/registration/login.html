@@ -1,0 +1,22 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  {% include "registration/_auth_side.html" with heading="С возвращением" lead="Войдите, чтобы тренировать свои словари, сохранять избранное и видеть прогресс." %}
+  <section class="card">
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      {% include "dictionary/_form_errors.html" %}
+      {% for field in form %}{% include "dictionary/_field.html" %}{% endfor %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn btn-blue btn-block" type="submit">Войти</button>
+    </form>
+    <p class="small mt"><a href="{% url 'password_reset' %}">Забыли пароль?</a></p>
+    {% if YANDEX_LOGIN_ENABLED %}
+    <div class="divider mt">или</div>
+    <a class="btn btn-yandex btn-block mt" href="{% url 'social:begin' 'yandex-oauth2' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Войти через Яндекс</a>
+    {% endif %}
+    <p class="small muted mt">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a> — это бесплатно.</p>
+  </section>
+</div>
+{% endblock %}

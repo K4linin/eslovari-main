@@ -1,0 +1,18 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Резервные коды{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <section class="card-blue">
+    {% include "dictionary/_waves.html" with variant="auth" %}
+    <h1 class="display page-title">Резервные коды</h1>
+    <p class="lead mt">Каждый код работает <strong>один раз</strong> — если телефон потерян или разряжен. Сохраните их в менеджер паролей или распечатайте. <strong>Больше мы их не покажем.</strong></p>
+  </section>
+  <section class="card stack">
+    <div class="code-grid" data-codes>{% for c in codes %}<code>{{ c }}</code>{% endfor %}</div>
+    <div class="row-actions">
+      <button class="btn btn-dark" type="button" data-copy-codes>Скопировать</button>
+      <a class="btn btn-blue" href="{% url 'profile' %}">Я сохранил коды</a>
+    </div>
+  </section>
+</div>
+{% endblock %}

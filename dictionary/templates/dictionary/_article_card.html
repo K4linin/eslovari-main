@@ -1,0 +1,8 @@
+<a class="card-blue article-card" href="{{ a.get_absolute_url }}">
+  <span class="chip chip-dark">{{ a.level }} · {{ a.reading_minutes }} мин</span>
+  <h3>{{ a.title }}</h3>
+  <div class="rows">
+    {% if a.summary %}<div class="row"><span>{{ a.summary|truncatechars:90 }}</span></div>{% endif %}
+    <div class="row"><span>Читать статью</span>{% include "dictionary/_arrow.html" %}</div>
+  </div>
+</a>
