@@ -1,0 +1,134 @@
+{% extends "dictionary/base.html" %}
+{% block content %}
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="card-blue hero-main">
+    {% include "dictionary/_waves.html" with variant="hero" %}
+    <h1 id="hero-title">IT-английский<span>для разработчиков, тестировщиков, аналитиков и DevOps</span></h1>
+    <p class="lead">Словарь живых терминов из кода, документации и созвонов. Тренируйся карточками, квизом и письмом — по 10 минут в день.</p>
+    <div class="hero-cta">
+      <a class="btn btn-white" href="{% url 'trainer' %}?mode=cards">Начать тренировку {% include "dictionary/_arrow.html" %}</a>
+      <a class="btn btn-ghost-light" href="#dictionary">Открыть словарь</a>
+    </div>
+  </div>
+
+  <div class="hero-side">
+    <div class="hero-visual">
+      {% include "dictionary/_waves.html" with variant="dark" %}
+      {% if word_of_day %}
+      <div class="hero-word">
+        <span class="chip chip-dark">Слово дня</span>
+        <div class="w mt">{{ word_of_day.word }}</div>
+        {% if word_of_day.transcription %}<div class="t">{{ word_of_day.transcription }}</div>{% endif %}
+        <div class="tr">{{ word_of_day.translation }}</div>
+      </div>
+      {% else %}
+      <div class="hero-word"><div class="w">Hello, world</div><div class="tr">Скоро здесь появятся слова</div></div>
+      {% endif %}
+    </div>
+    <div class="hero-pills">
+      <a class="pill-link" href="{% url 'set_list' %}">Наборы карточек <span class="dot">{% include "dictionary/_arrow.html" %}</span></a>
+      <a class="pill-link" href="{% url 'article_list' %}">Статьи A1–C2 <span class="dot">{% include "dictionary/_arrow.html" %}</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="modes-title">
+  <h2 class="bar" id="modes-title">Три режима тренировки — выбирай под настроение</h2>
+  <div class="grid grid-3 section">
+    {% for key, m in modes.items %}
+    <a class="card mode-card" href="{% url 'trainer' %}?mode={{ key }}">
+      <span class="card-title">{{ m.title }}:</span>
+      <span class="muted">{{ m.hint }}</span>
+      <span class="num">0{{ forloop.counter }}</span>
+      <span class="round-arrow go">{% include "dictionary/_arrow.html" %}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section card-dark" aria-label="О проекте">
+  <span class="chip chip-dark">eSlovari — это…</span>
+  <div class="stats-panel section">
+    <div class="waves-box">{% include "dictionary/_waves.html" with variant="panel" %}</div>
+    <div>
+      <div class="stat-row"><span class="stat-num">{{ stats.words }}</span> терминов в словаре с переводом и транскрипцией</div>
+      <div class="stat-row"><span class="stat-num">{{ stats.tags }}</span> IT-тем: от веба и баз данных до безопасности</div>
+      <div class="stat-row"><span class="stat-num">{{ stats.articles }}</span> статей на английском с уровнями A1–C2</div>
+      <div class="row-actions mt">
+        {% if user.is_authenticated %}
+        <a class="btn btn-blue" href="{% url 'topic_list' %}">Мои словари</a>
+        {% else %}
+        <a class="btn btn-blue" href="{% url 'register' %}">Создать аккаунт</a>
+        {% endif %}
+        <a class="btn btn-ghost-light" href="{% url 'set_list' %}">Все наборы {% include "dictionary/_arrow.html" %}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="dictionary" aria-labelledby="dict-title">
+  <div class="section-head">
+    <h2 class="chip" id="dict-title">Словарь IT-терминов</h2>
+    {% if current_tag %}
+    <div class="row-actions">
+      <a class="btn btn-sm btn-dark" href="{% url 'trainer' %}?mode=cards&tag={{ current_tag.slug }}">Тренировать тему {% include "dictionary/_arrow.html" %}</a>
+      {% if current_tag.pk in fav_tags %}{% include "dictionary/_fav_button.html" with kind="tag" obj=current_tag active=True cls="fav-inline" %}{% else %}{% include "dictionary/_fav_button.html" with kind="tag" obj=current_tag active=False cls="fav-inline" %}{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <form class="search" method="get" action="{% url 'home' %}#dictionary" role="search">
+    {% if current_tag %}<input type="hidden" name="tag" value="{{ current_tag.slug }}">{% endif %}
+    <label for="q" class="visually-hidden">Поиск по словарю</label>
+    <input id="q" name="q" value="{{ q }}" placeholder="Найти слово: deploy, запрос, branch…" maxlength="100" autocomplete="off">
+    <button class="btn btn-blue" type="submit">Найти</button>
+  </form>
+
+  <nav class="tabs" aria-label="Темы">
+    <a class="tab" href="{% url 'home' %}{% if q %}?q={{ q|urlencode }}{% endif %}#dictionary" aria-current="{% if not current_tag %}true{% else %}false{% endif %}">Все</a>
+    {% for t in tags %}
+    <a class="tab" href="?tag={{ t.slug }}{% if q %}&q={{ q|urlencode }}{% endif %}#dictionary" aria-current="{% if current_tag and current_tag.pk == t.pk %}true{% else %}false{% endif %}">{{ t.name }} · {{ t.n }}</a>
+    {% endfor %}
+  </nav>
+  <div class="tab-panel {% if not current_tag %}first-active{% endif %} on-blue">
+    {% if page.object_list %}
+    <div class="words">
+      {% for entry in page.object_list %}
+        {% if entry.pk in fav_entries %}{% include "dictionary/_word_card.html" with fav=True %}{% else %}{% include "dictionary/_word_card.html" with fav=False %}{% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty">Ничего не нашлось{% if q %} по запросу «{{ q }}»{% endif %}. Попробуйте другое слово.</p>
+    {% endif %}
+    {% if page.has_other_pages %}
+    <nav class="pager" aria-label="Страницы">
+      {% if page.has_previous %}<a class="chip" href="?page={{ page.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if current_tag %}&tag={{ current_tag.slug }}{% endif %}#dictionary">← Назад</a>{% endif %}
+      <span class="chip">{{ page.number }} / {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a class="chip" href="?page={{ page.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}{% if current_tag %}&tag={{ current_tag.slug }}{% endif %}#dictionary">Дальше →</a>{% endif %}
+    </nav>
+    {% endif %}
+  </div>
+</section>
+
+{% if sets %}
+<section class="section" aria-labelledby="sets-title">
+  <div class="section-head">
+    <h2 class="chip" id="sets-title">Наборы карточек</h2>
+    <a class="btn btn-sm btn-dark" href="{% url 'set_list' %}">Все наборы {% include "dictionary/_arrow.html" %}</a>
+  </div>
+  <div class="grid grid-3">
+    {% for s in sets %}{% include "dictionary/_set_card.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if articles %}
+<section class="section" aria-labelledby="art-title">
+  <h2 class="bar" id="art-title">Читаем по-английски</h2>
+  <div class="grid grid-3 section">
+    {% for a in articles %}{% include "dictionary/_article_card.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

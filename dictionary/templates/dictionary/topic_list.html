@@ -1,0 +1,28 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Мои словари{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <section class="card-blue">
+    {% include "dictionary/_waves.html" with variant="auth" %}
+    <h1 class="display page-title">Мои словари</h1>
+    <p class="lead">Собирайте свои темы: слова из общего словаря и собственные. Каждый словарь можно тренировать в любом режиме.</p>
+    <form method="post" class="form card mt">
+      {% csrf_token %}
+      {% include "dictionary/_form_errors.html" %}
+      {% for field in form %}{% include "dictionary/_field.html" %}{% endfor %}
+      <button class="btn btn-blue" type="submit">Создать словарь</button>
+    </form>
+  </section>
+  <section class="stack">
+    {% for t in topics %}
+    <a class="card mode-card" href="{{ t.get_absolute_url }}">
+      <span class="card-title">{{ t.title }}</span>
+      {% if t.description %}<span class="muted">{{ t.description }}</span>{% endif %}
+      <span class="row-actions mt"><span class="chip">{{ t.n_entries|add:t.n_own }} слов</span><span class="round-arrow go">{% include "dictionary/_arrow.html" %}</span></span>
+    </a>
+    {% empty %}
+    <div class="card"><p class="empty-muted center">Пока пусто. Создайте первый словарь слева.</p></div>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

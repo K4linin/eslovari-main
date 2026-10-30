@@ -1,0 +1,59 @@
+{% extends "dictionary/base.html" %}
+{% block title %}{{ topic.title }}{% endblock %}
+{% block content %}
+<section class="card-blue section">
+  {% include "dictionary/_waves.html" with variant="hero" %}
+  <a class="chip chip-dark" href="{% url 'topic_list' %}">← Мои словари</a>
+  <h1 class="display page-title mt">{{ topic.title }}</h1>
+  {% if topic.description %}<p class="lead">{{ topic.description }}</p>{% endif %}
+  <div class="row-actions">
+    {% for key, m in modes.items %}
+    <a class="btn {% if forloop.first %}btn-white{% else %}btn-ghost-light{% endif %}" href="{% url 'trainer' %}?mode={{ key }}&topic={{ topic.pk }}">{{ m.title }} {% include "dictionary/_arrow.html" %}</a>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="grid grid-2 section">
+  <section class="card">
+    <h2 class="card-title">Добавить своё слово</h2>
+    <form method="post" class="form">
+      {% csrf_token %}<input type="hidden" name="action" value="add_word">
+      {% with form=word_form %}{% include "dictionary/_form_errors.html" %}{% for field in form %}{% include "dictionary/_field.html" %}{% endfor %}{% endwith %}
+      <button class="btn btn-blue" type="submit">Добавить</button>
+    </form>
+    <p class="small muted mt">Слова из общего словаря добавляются кнопкой «В мой словарь» на странице слова.</p>
+  </section>
+  <section class="card">
+    <h2 class="card-title">Слова ({{ topic.word_count }})</h2>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Слово</th><th>Перевод</th><th></th></tr></thead>
+      <tbody>
+      {% for e in entries %}
+        <tr><td><a href="{{ e.get_absolute_url }}">{{ e.word }}</a></td><td>{{ e.translation }}</td>
+          <td><form method="post" class="inline-form">{% csrf_token %}<input type="hidden" name="action" value="remove_entry"><input type="hidden" name="entry" value="{{ e.pk }}"><button class="btn btn-sm btn-ghost" type="submit" aria-label="Убрать {{ e.word }}">✕</button></form></td></tr>
+      {% endfor %}
+      {% for w in own_words %}
+        <tr><td><strong>{{ w.word }}</strong>{% if w.transcription %} <span class="muted small">{{ w.transcription }}</span>{% endif %}</td><td>{{ w.translation }}</td>
+          <td><form method="post" class="inline-form">{% csrf_token %}<input type="hidden" name="action" value="remove_word"><input type="hidden" name="word" value="{{ w.pk }}"><button class="btn btn-sm btn-ghost" type="submit" aria-label="Удалить {{ w.word }}">✕</button></form></td></tr>
+      {% endfor %}
+      {% if not entries and not own_words %}<tr><td colspan="3" class="muted">Словарь пуст.</td></tr>{% endif %}
+      </tbody>
+    </table>
+    </div>
+  </section>
+</div>
+
+<details class="card section">
+  <summary>Настройки словаря</summary>
+  <form method="post" class="form mt">
+    {% csrf_token %}<input type="hidden" name="action" value="edit">
+    {% with form=edit_form %}{% include "dictionary/_form_errors.html" %}{% for field in form %}{% include "dictionary/_field.html" %}{% endfor %}{% endwith %}
+    <button class="btn btn-blue" type="submit">Сохранить</button>
+  </form>
+  <form method="post" class="mt" data-confirm="Удалить словарь «{{ topic.title }}» со всеми словами?">
+    {% csrf_token %}<input type="hidden" name="action" value="delete">
+    <button class="btn btn-danger" type="submit">Удалить словарь</button>
+  </form>
+</details>
+{% endblock %}

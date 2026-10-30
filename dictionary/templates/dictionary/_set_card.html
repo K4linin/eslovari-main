@@ -1,0 +1,9 @@
+<article class="card-blue set-card">
+  {% if s.pk in fav_sets %}{% include "dictionary/_fav_button.html" with kind="set" obj=s active=True %}{% else %}{% include "dictionary/_fav_button.html" with kind="set" obj=s active=False %}{% endif %}
+  <h3><a href="{{ s.get_absolute_url }}" class="stretched">{{ s.title }}</a></h3>
+  {% if s.description %}<p>{{ s.description|truncatechars:120 }}</p>{% endif %}
+  <div class="meta">
+    <span class="chip chip-dark">{{ s.n }} слов</span>
+    <a class="round-arrow" href="{{ s.get_absolute_url }}" aria-label="Открыть набор {{ s.title }}">{% include "dictionary/_arrow.html" %}</a>
+  </div>
+</article>

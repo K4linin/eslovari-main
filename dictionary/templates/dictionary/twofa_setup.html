@@ -1,0 +1,28 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Включить 2FA{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <section class="card-blue">
+    {% include "dictionary/_waves.html" with variant="auth" %}
+    <h1 class="display page-title">Двухфакторная защита</h1>
+    <ol class="lead mt">
+      <li>Установите приложение-аутентификатор. Рекомендуем <strong>Яндекс Ключ</strong> (на русском, работает офлайн); подойдут Google Authenticator, Microsoft Authenticator и любые TOTP-приложения.</li>
+      <li>Отсканируйте QR-код или нажмите кнопку на телефоне.</li>
+      <li>Введите 6-значный код из приложения.</li>
+    </ol>
+  </section>
+  <section class="card stack">
+    <img class="qr" src="{{ qr }}" alt="QR-код для приложения-аутентификатора" width="220" height="220">
+    <a class="btn btn-dark" href="{{ otpauth_url }}">Открыть в Яндекс Ключе (на телефоне)</a>
+    <div>
+      <div class="small muted">Или введите ключ вручную:</div>
+      <div class="secret">{{ secret }}</div>
+    </div>
+    <form method="post" class="form">
+      {% csrf_token %}
+      {% for field in form %}{% include "dictionary/_field.html" %}{% endfor %}
+      <button class="btn btn-blue" type="submit">Подтвердить и включить</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

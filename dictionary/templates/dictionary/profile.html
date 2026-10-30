@@ -1,0 +1,89 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<section class="card-blue section">
+  {% include "dictionary/_waves.html" with variant="hero" %}
+  <div class="profile-head">
+    {% if prof.avatar %}<img class="avatar-big" src="{{ prof.avatar.url }}" alt="Аватар">{% else %}<div class="avatar-big">{{ user.username|first|upper }}</div>{% endif %}
+    <div>
+      <h1 class="display page-title">{{ user.get_full_name|default:user.username }}</h1>
+      <div class="row-actions mt">
+        <span class="chip chip-dark">@{{ user.username }}</span>
+        {% if prof.group %}<span class="chip chip-dark">Группа {{ prof.group }}</span>{% endif %}
+        {% if prof.telegram %}<a class="chip chip-dark" href="https://t.me/{{ prof.telegram }}" rel="noopener noreferrer" target="_blank">Telegram</a>{% endif %}
+        {% if prof.vk %}<a class="chip chip-dark" href="https://vk.com/{{ prof.vk }}" rel="noopener noreferrer" target="_blank">VK</a>{% endif %}
+        {% if prof.github %}<a class="chip chip-dark" href="https://github.com/{{ prof.github }}" rel="noopener noreferrer" target="_blank">GitHub</a>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% if prof.bio %}<p class="lead mt">{{ prof.bio }}</p>{% endif %}
+</section>
+
+<div class="grid grid-4 section">
+  <div class="card"><div class="stat-num">{{ totals.sessions }}</div><div class="muted">тренировок</div></div>
+  <div class="card"><div class="stat-num">{{ totals.accuracy }}%</div><div class="muted">верных ответов</div></div>
+  <div class="card"><div class="stat-num">{{ topics_count }}</div><div class="muted">моих словарей</div></div>
+  <div class="card"><div class="stat-num">{{ prof.favorite_entries.count }}</div><div class="muted">слов в избранном</div></div>
+</div>
+
+<div class="grid grid-2 section">
+  <section class="card">
+    <h2 class="card-title">Редактировать профиль</h2>
+    <form method="post" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      {% for field in user_form %}{% include "dictionary/_field.html" %}{% endfor %}
+      {% for field in profile_form %}{% include "dictionary/_field.html" %}{% endfor %}
+      <button class="btn btn-blue" type="submit">Сохранить</button>
+    </form>
+  </section>
+
+  <div class="stack">
+    <section class="card">
+      <h2 class="card-title">Безопасность</h2>
+      <dl class="kv">
+        <dt>Текущий вход</dt><dd>{{ prof.current_login|date:"j E Y, H:i"|default:"—" }}</dd>
+        <dt>Предыдущий вход</dt><dd>{{ prof.previous_login|date:"j E Y, H:i"|default:"это первый вход" }}</dd>
+      </dl>
+      <p class="small muted mt">Не узнаёте дату предыдущего входа? Срочно смените пароль и включите 2FA.</p>
+
+      {% if user.has_usable_password %}
+      <div class="row-actions mt">
+        <a class="btn btn-dark" href="{% url 'password_change' %}">Сменить пароль</a>
+        {% if not has_2fa %}<a class="btn btn-blue" href="{% url 'twofa_setup' %}">Включить 2FA</a>{% endif %}
+      </div>
+      {% if has_2fa %}
+      <p class="mt"><strong>✅ Двухфакторная аутентификация включена.</strong> Резервных кодов осталось: {{ backup_left }}.</p>
+      <details class="mt">
+        <summary>Новые резервные коды</summary>
+        <form method="post" action="{% url 'twofa_regenerate' %}" class="form mt">{% csrf_token %}
+          <div class="field"><label for="pw-regen">Текущий пароль</label><input id="pw-regen" type="password" name="password" autocomplete="current-password" required></div>
+          <button class="btn btn-blue" type="submit">Создать новые коды</button>
+        </form>
+      </details>
+      <details class="mt">
+        <summary>Отключить 2FA</summary>
+        <form method="post" action="{% url 'twofa_disable' %}" class="form mt">{% csrf_token %}
+          <div class="field"><label for="pw-off">Текущий пароль</label><input id="pw-off" type="password" name="password" autocomplete="current-password" required></div>
+          <button class="btn btn-danger" type="submit">Отключить 2FA</button>
+        </form>
+      </details>
+      {% endif %}
+      {% else %}
+      <p class="mt">Вы входите через <strong>Яндекс ID</strong> — пароль и второй фактор защищает Яндекс.</p>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Последние тренировки</h2>
+      {% if results %}
+      <div class="table-wrap"><table class="table">
+        <thead><tr><th>Когда</th><th>Режим</th><th>Что</th><th>Итог</th></tr></thead>
+        <tbody>{% for r in results %}<tr><td>{{ r.created_at|date:"j.m H:i" }}</td><td>{{ r.get_mode_display }}</td><td>{{ r.source }}</td><td>{{ r.correct }}/{{ r.total }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}
+      <p class="muted">Ещё не было тренировок. <a href="{% url 'trainer' %}">Начните прямо сейчас</a>.</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

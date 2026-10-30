@@ -1,0 +1,49 @@
+{% extends "dictionary/base.html" %}
+{% block title %}{{ entry.word }} — перевод{% endblock %}
+{% block description %}{{ entry.word }} — {{ entry.translation }}. {{ entry.description|truncatechars:140 }}{% endblock %}
+{% block content %}
+<div class="hero">
+  <section class="card-blue hero-main">
+    {% include "dictionary/_waves.html" with variant="hero" %}
+    <a class="chip chip-dark" href="{% url 'home' %}#dictionary">← Словарь</a>
+    <h1 class="mt">{{ entry.word }}</h1>
+    {% if entry.transcription %}<p class="lead">{{ entry.transcription }}</p>{% endif %}
+    <p class="hero-word"><span class="tr">{{ entry.translation }}</span></p>
+    <div class="hero-cta">
+      {% if entry.pk in fav_entries %}{% include "dictionary/_fav_button.html" with kind="entry" obj=entry active=True cls="fav-inline" %}{% else %}{% include "dictionary/_fav_button.html" with kind="entry" obj=entry active=False cls="fav-inline" %}{% endif %}
+      {% for t in entry.tags.all %}<a class="chip chip-dark" href="{% url 'home' %}?tag={{ t.slug }}#dictionary">{{ t.name }}</a>{% endfor %}
+    </div>
+  </section>
+  <section class="card stack">
+    {% if entry.description %}<div><h2 class="card-title">Значение</h2><p>{{ entry.description }}</p></div>{% endif %}
+    {% if entry.example %}<div><h2 class="card-title">Пример</h2><p><em>{{ entry.example }}</em></p></div>{% endif %}
+    <div>
+      <h2 class="card-title">В мой словарь</h2>
+      {% if user.is_authenticated %}
+        {% if topics %}
+        <form method="post" action="{% url 'topic_add_entry' entry.pk %}" class="row-actions">
+          {% csrf_token %}
+          <div class="field"><label for="topic" class="visually-hidden">Словарь</label>
+            <select id="topic" name="topic">{% for t in topics %}<option value="{{ t.pk }}">{{ t.title }}</option>{% endfor %}</select>
+          </div>
+          <button class="btn btn-blue" type="submit">Добавить</button>
+        </form>
+        {% else %}
+        <p class="muted">У вас пока нет своих словарей. <a href="{% url 'topic_list' %}">Создайте первый</a>.</p>
+        {% endif %}
+      {% else %}
+        <p class="muted"><a href="{% url 'login' %}?next={{ request.path|urlencode }}">Войдите</a>, чтобы собирать свои словари и избранное.</p>
+      {% endif %}
+    </div>
+  </section>
+</div>
+
+{% if related %}
+<section class="section">
+  <div class="section-head"><h2 class="chip">Из той же темы</h2></div>
+  <div class="words">
+    {% for entry in related %}{% if entry.pk in fav_entries %}{% include "dictionary/_word_card.html" with fav=True %}{% else %}{% include "dictionary/_word_card.html" with fav=False %}{% endif %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

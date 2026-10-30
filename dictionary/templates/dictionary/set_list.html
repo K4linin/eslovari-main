@@ -1,0 +1,12 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Наборы карточек{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="bar">Наборы карточек</h1>
+  {% if sets %}
+  <div class="grid grid-3 section">{% for s in sets %}{% include "dictionary/_set_card.html" %}{% endfor %}</div>
+  {% else %}
+  <div class="card section"><p class="empty">Наборов пока нет — сотрудники скоро их добавят.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

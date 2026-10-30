@@ -1,0 +1,35 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Избранное{% endblock %}
+{% block content %}
+<section class="section">
+  <h1 class="bar">Избранное</h1>
+
+  <div class="section-head section">
+    <h2 class="chip">Слова · {{ entries|length }}</h2>
+    {% if entries %}<a class="btn btn-sm btn-dark" href="{% url 'trainer' %}?mode=cards&favorites=1">Тренировать избранное {% include "dictionary/_arrow.html" %}</a>{% endif %}
+  </div>
+  {% if entries %}
+  <div class="tab-panel"><div class="words">{% for entry in entries %}{% include "dictionary/_word_card.html" with fav=True %}{% endfor %}</div></div>
+  {% else %}
+  <div class="card"><p class="empty-muted">Нажмите ☆ на карточке слова, чтобы добавить его сюда.</p></div>
+  {% endif %}
+
+  <div class="section-head section"><h2 class="chip">Наборы · {{ sets|length }}</h2></div>
+  {% if sets %}<div class="grid grid-3">{% for s in sets %}{% include "dictionary/_set_card.html" %}{% endfor %}</div>
+  {% else %}<div class="card"><p class="empty-muted">Избранных наборов нет.</p></div>{% endif %}
+
+  <div class="section-head section"><h2 class="chip">Темы · {{ tags|length }}</h2></div>
+  {% if tags %}
+  <div class="grid grid-4">
+    {% for t in tags %}
+    <div class="card mode-card">
+      {% include "dictionary/_fav_button.html" with kind="tag" obj=t active=True %}
+      <a class="card-title" href="{% url 'home' %}?tag={{ t.slug }}#dictionary">{{ t.name }}</a>
+      <span class="muted">{{ t.n }} слов</span>
+      <a class="btn btn-sm btn-blue mt" href="{% url 'trainer' %}?mode=quiz&tag={{ t.slug }}">Квиз по теме</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}<div class="card"><p class="empty-muted">Откройте тему в словаре и нажмите ☆ рядом с поиском.</p></div>{% endif %}
+</section>
+{% endblock %}

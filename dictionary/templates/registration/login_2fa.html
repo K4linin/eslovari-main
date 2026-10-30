@@ -1,0 +1,16 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Код подтверждения{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  {% include "registration/_auth_side.html" with heading="Ещё один шаг" lead="Откройте Яндекс Ключ (или другое приложение-аутентификатор) и введите 6-значный код. Потеряли телефон — введите один из резервных кодов." %}
+  <section class="card">
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      {% include "dictionary/_form_errors.html" %}
+      {% for field in form %}{% include "dictionary/_field.html" %}{% endfor %}
+      <button class="btn btn-blue btn-block" type="submit">Подтвердить</button>
+    </form>
+    <p class="small mt"><a href="{% url 'login' %}">← Войти под другим аккаунтом</a></p>
+  </section>
+</div>
+{% endblock %}

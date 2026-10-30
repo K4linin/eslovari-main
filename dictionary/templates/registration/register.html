@@ -1,0 +1,32 @@
+{% extends "dictionary/base.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  {% include "registration/_auth_side.html" with heading="Создать аккаунт" lead="Свои словари, избранное, статистика тренировок. Пароль хранится в зашифрованном виде (Argon2), а вход можно защитить вторым фактором." %}
+  <section class="card">
+    <form method="post" class="form" novalidate>
+      {% csrf_token %}
+      {% include "dictionary/_form_errors.html" %}
+      {% for field in form %}
+        {% if field.name == "website" %}
+          <div class="hp-field" aria-hidden="true">{{ field.label_tag }}{{ field }}</div>
+        {% else %}
+          {% include "dictionary/_field.html" %}
+          {% if field.name == "password1" %}
+          <div class="field" data-strength-for="{{ field.id_for_label }}">
+            <div class="strength"><span></span></div>
+            <div class="strength-label" aria-live="polite">Надёжность пароля</div>
+          </div>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      <button class="btn btn-blue btn-block" type="submit">Зарегистрироваться</button>
+    </form>
+    {% if YANDEX_LOGIN_ENABLED %}
+    <div class="divider mt">или</div>
+    <a class="btn btn-yandex btn-block mt" href="{% url 'social:begin' 'yandex-oauth2' %}">Через Яндекс ID</a>
+    {% endif %}
+    <p class="small muted mt">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+  </section>
+</div>
+{% endblock %}
