@@ -312,3 +312,11 @@ class StudentFeatureTests(TestCase):
         self.assertEqual(bad.status_code, 400)
         self.assertEqual(TrainingResult.objects.count(), 1)
         self.assertContains(self.client.get("/profile/"), "70%")
+
+
+class SearchByTopicTests(TestCase):
+    def test_search_matches_topic_name(self):
+        call_command("seed_data", verbosity=0)
+        response = self.client.get("/?q=git")
+        self.assertContains(response, "branch")
+        self.assertContains(response, "merge")

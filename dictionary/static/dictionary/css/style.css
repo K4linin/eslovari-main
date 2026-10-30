@@ -331,7 +331,7 @@ p { margin: 0 0 1em; }
 
 .words { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
 .word {
-  position: relative; background: var(--surface); border-radius: 20px; padding: 18px 18px 16px;
+  position: relative; background: var(--surface); color: var(--text); border-radius: 20px; padding: 18px 18px 16px;
   display: flex; flex-direction: column; gap: 4px; min-height: 150px;
 }
 .word h3 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; padding-right: 36px; }
@@ -431,7 +431,7 @@ p { margin: 0 0 1em; }
 .feedback.ok { color: #b9ffd9; }
 .feedback.bad { color: #ffd1d3; }
 .trainer-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
-.result-big { font-family: var(--font-display); font-size: clamp(48px, 10vw, 88px); font-weight: 700; line-height: 1; }
+.result-big { margin-top: 12px; font-family: var(--font-display); font-size: clamp(48px, 10vw, 88px); font-weight: 700; line-height: 1; }
 
 /* --- Формы ----------------------------------------------------------------- */
 

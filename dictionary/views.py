@@ -53,7 +53,10 @@ def _search_entries(request, queryset):
     current_tag = None
     if q:
         queryset = queryset.filter(
-            Q(word__icontains=q) | Q(translation__icontains=q) | Q(description__icontains=q)
+            Q(word__icontains=q)
+            | Q(translation__icontains=q)
+            | Q(description__icontains=q)
+            | Q(tags__name__icontains=q)
         )
     if tag_slug:
         current_tag = Tag.objects.filter(slug=tag_slug).first()
