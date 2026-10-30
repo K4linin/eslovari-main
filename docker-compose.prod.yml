@@ -46,7 +46,6 @@ services:
       - "443:443/udp"
     environment:
       DOMAIN: ${DOMAIN:?Задайте DOMAIN в .env}
-      ACME_EMAIL: ${ACME_EMAIL:-}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - media:/srv/media:ro
